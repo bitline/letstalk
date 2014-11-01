@@ -22,22 +22,40 @@
 
 	var isB = function(hand, thumb, index, middle, ring, pinky){
 		if(!thumb.extended && index.extended && middle.extended && ring.extended && pinky.extended){
-			return true;
+			return {ok:true, letter:"B"};
 		}
-		return false;
+		return {ok:false, letter:"B"};
 	}
 
-	var signs = [isB]
+	var isU = function(hand, thumb, index, middle, ring, pinky){
+		if (index.extended && middle.extended && !thumb.extended && !ring.extended && !pinky.extended){
+			return {ok:true, letter:"U"};
+		}
+		return {ok:false, letter:"U"};
+	}
+
+	var isL = function(hand, thumb, index, middle, ring, pinky){
+		if (index.extended && !middle.extended && thumb.extended && !ring.extended && !pinky.extended){
+			return {ok:true, letter:"L"};
+		}
+		return {ok:false, letter:"L"};
+	}
+
+
+	var signs = [isB, isU, isL]
+	var last = null;
+	var string = "";
 
 	var checkLetter = function(hand, thumb, index, middle, ring, pinky){
 		var check = false;
 		for(var s=0; s<signs.length; s++){
-			if(signs[s](hand, thumb, index, middle, ring, pinky)){
-				return true;
+			var is = signs[s](hand, thumb, index, middle, ring, pinky); 
+			if(is.ok){
+				return is;
 			}
 		}
 
-		return false;
+		return {ok:false, letter: null};
 	}
 
 	var options = { enableGestures: true};
@@ -47,18 +65,6 @@
 		frameString += concatData("num_fingers", frame.fingers.length);
 		frameString += "<br>";
 
-		
-/*		for(var g = 0; g < frame.gestures.length; g++){
-    		console.log(frame.gestures[g]);
-		}
-
-		for(var i = 0, len = frame.hands.length; i < len; i++)
-		{
-			hand = frame.hands[i];
-			handString = concatData("hand_type", hand.type);
-			frameString += handString;
-		}
-*/
 		for(var h=0; h<frame.hands.length; h++){
 			var hand = frame.hands[h];
 			if(hand.type === 'right'){
@@ -69,9 +75,13 @@
 				ring = hand.fingers[3];
 				pinky = hand.fingers[4];
 
+				var checker = checkLetter(hand, thumb, index, middle, ring, pinky);
+				if(checker.ok && last != checker.letter){
+					string += checker.letter;
+					last = checker.letter;
 
-				console.log(checkLetter(hand, thumb, index, middle, ring, pinky));
-
+					console.log(string);
+				}
 
 			}
 		}
