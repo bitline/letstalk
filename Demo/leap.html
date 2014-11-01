@@ -19,27 +19,33 @@
 	var frameString = "", handString = "", fingerString = "";
 	var hand, finger;
 
+	var isA = function(hand, thumb, index, middle, ring, pinky){
+		if(!thumb.extended && !index.extended && !middle.extended && !ring.extended && !pinky.extended){
+			return {ok: true, letter: 'A'};
+		}
+		return {ok: false,  letter: 'A'};
+	};
 
 	var isB = function(hand, thumb, index, middle, ring, pinky){
 		if(!thumb.extended && index.extended && middle.extended && ring.extended && pinky.extended){
 			return {ok:true, letter:"B"};
 		}
 		return {ok:false, letter:"B"};
-	}
+	};
 
 	var isU = function(hand, thumb, index, middle, ring, pinky){
 		if (index.extended && middle.extended && !thumb.extended && !ring.extended && !pinky.extended){
 			return {ok:true, letter:"U"};
 		}
 		return {ok:false, letter:"U"};
-	}
+	};
 
 	var isL = function(hand, thumb, index, middle, ring, pinky){
 		if (index.extended && !middle.extended && thumb.extended && !ring.extended && !pinky.extended){
 			return {ok:true, letter:"L"};
 		}
 		return {ok:false, letter:"L"};
-	}
+	};
 
 
 	var signs = [isB, isU, isL]
@@ -56,7 +62,7 @@
 		}
 
 		return {ok:false, letter: null};
-	}
+	};
 
 	var options = { enableGestures: true};
 	Leap.loop(options, function(frame){
