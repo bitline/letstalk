@@ -19,6 +19,27 @@
 	var frameString = "", handString = "", fingerString = "";
 	var hand, finger;
 
+
+	var isB = function(hand, thumb, index, middle, ring, pinky){
+		if(!thumb.extended && index.extended && middle.extended && ring.extended && pinky.extended){
+			return true;
+		}
+		return false;
+	}
+
+	var signs = [isB]
+
+	var checkLetter = function(hand, thumb, index, middle, ring, pinky){
+		var check = false;
+		for(var s=0; s<signs.length; s++){
+			if(signs[s](hand, thumb, index, middle, ring, pinky)){
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	var options = { enableGestures: true};
 	Leap.loop(options, function(frame){
 		frameString = concatData("frame_id", frame.id);
@@ -49,9 +70,8 @@
 				pinky = hand.fingers[4];
 
 
-				if(!thumb.extended && index.extended && middle.extended && ring.extended && pinky.extended){
-					console.log('Hola amigos!')
-				}
+				console.log(checkLetter(hand, thumb, index, middle, ring, pinky));
+
 
 			}
 		}
