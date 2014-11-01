@@ -33,6 +33,20 @@
 		return {ok:false, letter:"B"};
 	};
 
+	var isC = function(hand){
+		if (hand.grabStrength > 0.4 && hand.grabStrength < 0.7){
+			return {ok: true, letter:"C"};
+		}
+		return {ok: false, letter: "C"};
+	};
+
+	var isE = function(hand){
+		if(hand.grabStrength > 0.65 && hand.grabStrength < 0.8){
+			return {ok: true, letter: "E"};
+		}
+		return {ok: false, letter: "E"};
+	};
+
 	var isU = function(hand, thumb, index, middle, ring, pinky){
 		if (index.extended && middle.extended && !thumb.extended && !ring.extended && !pinky.extended){
 			return {ok:true, letter:"U"};
@@ -48,7 +62,9 @@
 	};
 
 
-	var signs = [isB, isU, isL]
+
+
+	var signs = [isB, isU, isL, isA, isC];
 	var last = null;
 	var removed = false;
 	var string = "";
