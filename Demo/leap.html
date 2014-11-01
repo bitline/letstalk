@@ -28,7 +28,10 @@
 	}
 
 	var isU = function(hand, thumb, index, middle, ring, pinky){
-		if (index.extended && middle.extended && !thumb.extended && !ring.extended && !pinky.extended){
+			var indexDistal = ring.dipPosition;
+			var thumbMedial = thumb.dipPosition;
+			var distance = Math.sqrt(Math.abs(  (thumbMedial[0]-indexDistal[0])^2 + (thumbMedial[1]-indexDistal[1])^2  ))
+		if (index.extended && middle.extended && !thumb.extended && !ring.extended && !pinky.extended && distance <= 3){
 			return {ok:true, letter:"U"};
 		}
 		return {ok:false, letter:"U"};
@@ -74,7 +77,7 @@
 					removed = true;
 					string = string.substring(0, string.length - 1);
 					last = null;
-					setTimeout(function(){removed=false;}, 1000)
+					setTimeout(function(){removed=false;}, 600)
 					console.log("Borrado: " + string);
 				}
 			}
@@ -83,7 +86,7 @@
 
 		for(var h=0; h<frame.hands.length; h++){
 			var hand = frame.hands[h];
-			if(hand.type === 'right'){
+			if(hand.type){
 				var thumb, index, middle, ring, pinky;
 				thumb = hand.fingers[0];
 				index = hand.fingers[1];
