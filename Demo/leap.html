@@ -5,36 +5,54 @@
 	<title>Leap 0.1v</title>
 </head>
 <body>
-	<h1>Leap testing V 1.0</h1>
+	<h1>Let's Talk</h1>
 	<div id="data">
 	</div>
 
 	<div>
 		<form name="data_hand">
-			<textarea name="hand_fingers"></textarea>
+			<textarea cols="80" rows="25" name="hand_fingers"></textarea>
 		</form>
 	</div>
-</body>
 <script src="http://js.leapmotion.com/leap-0.6.3.min.js"></script>
 <script type="text/javascript">
 
-
+	var output = document.getElementById('data');
 	var form = document.data_hand;
 	var textarea = form.hand_fingers;
+	var frameString;
 
 	var options = { enableGestures: true};
+	var tests = 0, iters=0;
 	Leap.loop(options, function(frame){
-
-		for(var h=0; h<frame.hands.length; h++){
+		for(var h=0; h < frame.hands.length; h++){
+			var coords = [];
 			var hand = frame.hands[h];
 			if(hand.type == 'right'){
-				
-			}
+				if((iters+1) % 13 !== 0 ){ iters++; continue; }
+				hand.fingers.forEach(function(finger){
+					var fing = finger.type.toString();
+					var fingerData = [];
+					for(var b=0; b<finger.bones.length; b++){
+						var bone = finger.bones[b];
+						fingerData.push(bone.basis);
+					}
+					coords.push(fingerData);
+				});
+				iters++;
+				tests++;
+
+				if(coords.length > 0){
+					textarea.value += JSON.stringify(coords) + ", 'k', "
+				}
+				console.log(tests);
+			}			
 		}
 
-		output.innerHTML = frameString;
+		output.innerHTML = 'Data';
 
 	});
 
 </script>
+</body>
 </html>
