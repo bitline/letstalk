@@ -124,29 +124,20 @@
 			if(!semaforo){ return false; }
 			if(hand.type === 'right'){
 				var thumb, index, middle, ring, pinky;
-				hand.fingers.forEach(function(finger){
-					var fing = finger.type.toString();
-					coords[fing] = [];
-					for(var b=0; b<finger.bones.length; b++){
-						var bone = finger.bones[b];
-						coords[fing].push(bone.basis);
-					}
-				});
 
-				console.table(JSON.stringify(coords))
-				// thumb = hand.fingers[0];
-				// index = hand.fingers[1];
-				// middle = hand.fingers[2];
-				// ring = hand.fingers[3];
-				// pinky = hand.fingers[4];
+				thumb = hand.fingers[0];
+				index = hand.fingers[1];
+				middle = hand.fingers[2];
+				ring = hand.fingers[3];
+				pinky = hand.fingers[4];
 
-				// var checker = checkLetter(hand, thumb, index, middle, ring, pinky);
-				// if(checker.ok && last != checker.letter){
-				// 	string += checker.letter;
-				// 	last = checker.letter;
-				// 	setTimeout(function(){last=null;}, 1500);
-				// 	console.log("+Letter: " + string);
-				// }
+				var checker = checkLetter(hand, thumb, index, middle, ring, pinky);
+				if(checker.ok && last != checker.letter){
+					string += checker.letter;
+					last = checker.letter;
+					setTimeout(function(){last=null;}, 1500);
+					console.log("+Letter: " + string);
+				}
 
 			}
 		}
