@@ -138,7 +138,8 @@
 	// };
 
 
-	var signs = [isB, isU, isL, isA, isV, isC, isY, isI, isW];
+	var signs_right = [isB, isV, isC, isY, isI, isW];
+	var signs_left = [isA, isU, isL]
 
 	var last = null;
 	var removed = false;
@@ -155,11 +156,22 @@
 	var checkLetter = function(hand, thumb, index, middle, ring, pinky){
 		semaforo = false;
 		var check = false;
-		for(var s=0; s<signs.length; s++){
-			var is = signs[s](hand, thumb, index, middle, ring, pinky); 
-			if(is.ok){
-				semaforo = true;
-				return is;
+		if(hand.type === 'right'){
+			for(var s=0; s<signs_right.length; s++){
+				var is = signs_right[s](hand, thumb, index, middle, ring, pinky); 
+				if(is.ok){
+					semaforo = true;
+					return is;
+				}
+			}
+		}
+		if(hand.type === 'left'){
+			for(var s=0; s<signs_left.length; s++){
+				var is = signs_left[s](hand, thumb, index, middle, ring, pinky); 
+				if(is.ok){
+					semaforo = true;
+					return is;
+				}
 			}
 		}
 		semaforo = true;
@@ -178,6 +190,23 @@
 			var hand = frame.hands[h];
 			var coords = {};
 			if(!semaforo){ return false; }
+
+			var thumb, index, middle, ring, pinky;
+
+			thumb = hand.fingers[0];
+			index = hand.fingers[1];
+			middle = hand.fingers[2];
+			ring = hand.fingers[3];
+			pinky = hand.fingers[4];
+
+			var checker = checkLetter(hand, thumb, index, middle, ring, pinky);
+			if(checker.ok && last != checker.letter){
+				string += checker.letter;
+				last = checker.letter;
+				letter.innerHTML = checker.letter;
+				dataText.value = string;
+				setTimeout(function(){last=null;}, 1500);
+			}
 
 			if(hand.type === 'left'){
 				for(var g = 0; g < frame.gestures.length; g++){
@@ -202,26 +231,7 @@
 				}
 				return;
 			}
-
-			if(hand.type === 'right'){
-				var thumb, index, middle, ring, pinky;
-
-				thumb = hand.fingers[0];
-				index = hand.fingers[1];
-				middle = hand.fingers[2];
-				ring = hand.fingers[3];
-				pinky = hand.fingers[4];
-
-				var checker = checkLetter(hand, thumb, index, middle, ring, pinky);
-				if(checker.ok && last != checker.letter){
-					string += checker.letter;
-					last = checker.letter;
-					letter.innerHTML = checker.letter;
-					dataText.value = string;
-					setTimeout(function(){last=null;}, 1500);
-				}
-
-			}
+		
 		}
 	});
 
