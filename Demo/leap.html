@@ -168,7 +168,7 @@
 			if(hand.type === 'left'){
 				for(var g = 0; g < frame.gestures.length; g++){
 		    		var gesture = frame.gestures[g];
-					if(gesture.type === 'circle' && gesture.radius > 4 && !removed){
+					if(gesture.type === 'circle' && gesture.radius > 50 && !removed){
 						if(string.length > 0){
 							removed = true;
 							string = string.substring(0, string.length - 1);
@@ -177,7 +177,7 @@
 							console.log("Borrado: " + string);
 							dataText.value = string;
 						}
-					}else if(gesture.type === 'swipe' && gesture.speed>2 && !removed){
+					}else if(gesture.type === 'swipe' && gesture.speed>1 && !removed){
 						removed = true;
 						string = string + " ";
 						last = null;
