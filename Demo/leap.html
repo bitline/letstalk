@@ -28,9 +28,9 @@
 	};
 
 	var isB = function(hand, thumb, index, middle, ring, pinky){
-		var indexDistal = index.dipPosition;
+		var thumbDistal = thumb.dipPosition;
 		var palm = hand.palmPosition;
-		var distance = Math.sqrt(Math.abs(  (palm[0]-indexDistal[0])^2 + (palm[1]-indexDistal[1])^2  ))
+		var distance = Math.sqrt( (palm[0]-thumbDistal[0])^2 + (palm[2]-thumbDistal[2])^2 )
 		if(!thumb.extended && index.extended && middle.extended && ring.extended && pinky.extended && distance <= 4){
 			return {ok:true, letter:"B"};
 		}
@@ -78,6 +78,10 @@
 	var removed = false;
 	var string = "";
 
+	var collectData = function(hand){
+
+	}
+
 	var checkLetter = function(hand, thumb, index, middle, ring, pinky){
 		semaforo = false;
 		var check = false;
@@ -116,22 +120,33 @@
 
 		for(var h=0; h<frame.hands.length; h++){
 			var hand = frame.hands[h];
+			var coords = {};
 			if(!semaforo){ return false; }
-			if(hand.type){
+			if(hand.type === 'right'){
 				var thumb, index, middle, ring, pinky;
-				thumb = hand.fingers[0];
-				index = hand.fingers[1];
-				middle = hand.fingers[2];
-				ring = hand.fingers[3];
-				pinky = hand.fingers[4];
+				hand.fingers.forEach(function(finger){
+					var fing = finger.type.toString();
+					coords[fing] = [];
+					for(var b=0; b<finger.bones.length; b++){
+						var bone = finger.bones[b];
+						coords[fing].push(bone.basis);
+					}
+				});
 
-				var checker = checkLetter(hand, thumb, index, middle, ring, pinky);
-				if(checker.ok && last != checker.letter){
-					string += checker.letter;
-					last = checker.letter;
-					setTimeout(function(){last=null;}, 1500);
-					console.log("+Letter: " + string);
-				}
+				console.table(JSON.stringify(coords))
+				// thumb = hand.fingers[0];
+				// index = hand.fingers[1];
+				// middle = hand.fingers[2];
+				// ring = hand.fingers[3];
+				// pinky = hand.fingers[4];
+
+				// var checker = checkLetter(hand, thumb, index, middle, ring, pinky);
+				// if(checker.ok && last != checker.letter){
+				// 	string += checker.letter;
+				// 	last = checker.letter;
+				// 	setTimeout(function(){last=null;}, 1500);
+				// 	console.log("+Letter: " + string);
+				// }
 
 			}
 		}
