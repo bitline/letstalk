@@ -17,24 +17,28 @@
 	}
 	var output = document.getElementById("data");
 	var frameString = "", handString = "", fingerString = "";
+	var semaforo = true;
 	var hand, finger;
 
 	var isA = function(hand, thumb, index, middle, ring, pinky){
-		if(!thumb.extended && !index.extended && !middle.extended && !ring.extended && !pinky.extended){
+		if(!thumb.extended && !index.extended && !middle.extended && !ring.extended && !pinky.extended && hand.grabStrength === 1){
 			return {ok: true, letter: 'A'};
 		}
 		return {ok: false,  letter: 'A'};
 	};
 
 	var isB = function(hand, thumb, index, middle, ring, pinky){
-		if(!thumb.extended && index.extended && middle.extended && ring.extended && pinky.extended){
+		var thumbDistal = thumb.dipPosition;
+		var palm = hand.palmPosition;
+		var distance = Math.sqrt( (palm[0]-thumbDistal[0])^2 + (palm[2]-thumbDistal[2])^2 )
+		if(!thumb.extended && index.extended && middle.extended && ring.extended && pinky.extended && distance <= 4){
 			return {ok:true, letter:"B"};
 		}
 		return {ok:false, letter:"B"};
 	};
 
-	var isC = function(hand){
-		if (hand.grabStrength > 0.4 && hand.grabStrength < 0.7){
+	var isC = function(hand, thumb, index, middle, ring, pinky){
+		if (!thumb.extended && !index.extended && !middle.extended && !ring.extended && !pinky.extended && hand.grabStrength > 0.5 && hand.grabStrength < 0.69){
 			return {ok: true, letter:"C"};
 		}
 		return {ok: false, letter: "C"};
@@ -48,10 +52,12 @@
 	};
 
 	var isU = function(hand, thumb, index, middle, ring, pinky){
-			var indexDistal = ring.dipPosition;
-			var thumbMedial = thumb.dipPosition;
-			var distance = Math.sqrt(Math.abs(  (thumbMedial[0]-indexDistal[0])^2 + (thumbMedial[1]-indexDistal[1])^2  ))
-		if (index.extended && middle.extended && !thumb.extended && !ring.extended && !pinky.extended && distance <= 3){
+		var indexDistal = ring.dipPosition;
+		var thumbMedial = thumb.dipPosition;
+
+		var distance = Math.sqrt(Math.abs(  (thumbMedial[0]-indexDistal[0])^2 + (thumbMedial[1]-indexDistal[1])^2  ))
+		var open = Math.sqrt(Math.abs( (ring.pipPosition[0]-middle.pipPosition[0])^2 + (ring.pipPosition[1]-middle.pipPosition[1])^2 ))
+		if (index.extended && middle.extended && !thumb.extended && !ring.extended && !pinky.extended && distance <= 3 && open >= 3){
 			return {ok:true, letter:"U"};
 		}
 		return {ok:false, letter:"U"};
@@ -64,23 +70,40 @@
 		return {ok:false, letter:"L"};
 	};
 
+	var isY = function(hand, thumb, index, middle, ring, pinky){
+		if (pinky.extended && thumb.extended && !index.extended && !middle.extended && !ring.extended){
+			return {ok: true, letter: "Y"};
+		}
+		return {ok: false, letter: "Y"};
+	};
 
+	var isI = function(hand, thumb, index, middle, ring, pinky){
+		if (pinky.extended && !thumb.extended && !index.extended && !middle.extended && !ring.extended){
+			return {ok: true, letter: "i"};
+		}
+		return {ok: false, letter: "i"};
+	};
 
-
-	var signs = [isB, isU, isL, isA, isC];
+	var signs = [isB, isU, isL, isA, isC, isY, isI];
 	var last = null;
 	var removed = false;
 	var string = "";
 
+	var collectData = function(hand){
+
+	}
+
 	var checkLetter = function(hand, thumb, index, middle, ring, pinky){
+		semaforo = false;
 		var check = false;
 		for(var s=0; s<signs.length; s++){
 			var is = signs[s](hand, thumb, index, middle, ring, pinky); 
 			if(is.ok){
+				semaforo = true;
 				return is;
 			}
 		}
-
+		semaforo = true;
 		return {ok:false, letter: null};
 	};
 
@@ -108,8 +131,11 @@
 
 		for(var h=0; h<frame.hands.length; h++){
 			var hand = frame.hands[h];
-			if(hand.type){
+			var coords = {};
+			if(!semaforo){ return false; }
+			if(hand.type === 'right'){
 				var thumb, index, middle, ring, pinky;
+
 				thumb = hand.fingers[0];
 				index = hand.fingers[1];
 				middle = hand.fingers[2];
