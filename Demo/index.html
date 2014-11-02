@@ -180,15 +180,16 @@
 
 	var options = { enableGestures: true};
 	Leap.loop(options, function(frame){
-		frameString = concatData("frame_id", frame.id);
-		frameString += concatData("num_hands", frame.hands.length);
-		frameString += concatData("num_fingers", frame.fingers.length);
-		frameString += "<br>";
-
 
 		for(var h=0; h<frame.hands.length; h++){
 			var hand = frame.hands[h];
 			var coords = {};
+			var thumb, index, middle, ring, pinky;
+			thumb = hand.fingers[0];
+			index = hand.fingers[1];
+			middle = hand.fingers[2];
+			ring = hand.fingers[3];
+			pinky = hand.fingers[4];
 			if(!semaforo){ return false; }
 
 			var thumb, index, middle, ring, pinky;
@@ -211,7 +212,9 @@
 			if(hand.type === 'left'){
 				for(var g = 0; g < frame.gestures.length; g++){
 		    		var gesture = frame.gestures[g];
-					if(gesture.type === 'circle' && gesture.radius > 50 && !removed){
+					if(gesture.type === 'circle' && 
+						 index.extended && !thumb.extended && !ring.extended && !pinky.extended  && !middle.extended &&
+						 gesture.radius > 30 && !removed){
 						if(string.length > 0){
 							removed = true;
 							string = string.substring(0, string.length - 1);
@@ -220,7 +223,9 @@
 							letter.innerHTML = 'back';
 							dataText.value = string;
 						}
-					}else if(gesture.type === 'swipe' && gesture.speed>1 && !removed){
+					}else if(gesture.type === 'swipe' && index.extended &&
+						thumb.extended && ring.extended && pinky.extended  && middle.extended
+						&& !removed){
 						removed = true;
 						string = string + " ";
 						last = null;
@@ -231,7 +236,23 @@
 				}
 				return;
 			}
+<<<<<<< HEAD:Demo/index.html
 		
+=======
+
+			if(hand.type === 'right'){
+
+				var checker = checkLetter(hand, thumb, index, middle, ring, pinky);
+				if(checker.ok && last != checker.letter){
+					string += checker.letter;
+					last = checker.letter;
+					letter.innerHTML = checker.letter;
+					dataText.value = string;
+					setTimeout(function(){last=null;}, 1500);
+				}
+
+			}
+>>>>>>> ec398b33151f6a428ba55d34f0924ecfb34b817e:Demo/leap.html
 		}
 	});
 
