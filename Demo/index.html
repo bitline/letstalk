@@ -236,23 +236,7 @@
 				}
 				return;
 			}
-<<<<<<< HEAD:Demo/index.html
-		
-=======
 
-			if(hand.type === 'right'){
-
-				var checker = checkLetter(hand, thumb, index, middle, ring, pinky);
-				if(checker.ok && last != checker.letter){
-					string += checker.letter;
-					last = checker.letter;
-					letter.innerHTML = checker.letter;
-					dataText.value = string;
-					setTimeout(function(){last=null;}, 1500);
-				}
-
-			}
->>>>>>> ec398b33151f6a428ba55d34f0924ecfb34b817e:Demo/leap.html
 		}
 	});
 
