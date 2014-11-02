@@ -1,0 +1,59 @@
+body{
+	color: #FFF;
+	font-size: 14px;
+	font-family: 'Montserrat', Helvetica, Arial;
+	background-color: rgba(255, 98, 2, 0.87);
+}
+
+#data{
+	text-align: center;
+}
+
+.left{
+	min-height: 80%;
+	width: 50%;
+	float: right;
+	top: 60px;
+	padding: 2% 0;
+}
+
+.big-letter{
+	font-size: 10em;
+	text-align: center;
+	font-weight: bold;
+}
+
+h1{
+	text-align: center;
+	font-size: 3em;
+	font-family: 'Lobster';
+	background-color: transparent;
+}
+
+.left textarea, .left label{
+	font-family: inherit;
+	display: block;
+	width: 90%;
+	max-width: 90%;
+	margin: 0 auto;
+}
+
+.left textarea:focus{
+	border: 1px dashed #FFF;
+}
+
+.left textarea{
+	padding: 2%;
+	border-radius:5px;
+	border: 0;
+	outline:0;
+	min-height: 200px
+}
+
+canvas{
+
+	padding-top: 60px !important;
+	float: left !important;
+	width: 50% !important;
+	position: absolute !important
+}
