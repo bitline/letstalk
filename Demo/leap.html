@@ -2,15 +2,21 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Leap 0.1v</title>
+	<title>Hablemos! - Demo</title>
+	<link href='http://fonts.googleapis.com/css?family=Lobster|Montserrat:400,700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
 	<h1>¡Hablemos!</h1>
-	<div id="data">
+	<div class="left">
+		<div id="data">
+			<span class="big-letter">-</span>
+		</div>
+		<form name="data">
+			<label>Traducci&oacute;n: </label>
+			<textarea name="text"></textarea>
+		</form>
 	</div>
-	<form name="data">
-		<textarea name="text"></textarea>
-	</form>
 </body>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r67/three.js"></script>
 <script src="http://js.leapmotion.com/leap-0.6.2.min.js"></script>
@@ -132,11 +138,19 @@
 	// };
 
 
-	var signs = [isB, isU, isL, isA, isC, isY, isI, isW];
+	var signs = [isB, isU, isL, isA, isV, isC, isY, isI, isW];
 
 	var last = null;
 	var removed = false;
 	var string = "";
+
+	var letter = null;
+	for (var i = 0; i < output.childNodes.length; i++) {
+	    if (output.childNodes[i].className == "big-letter") {
+	      letter = output.childNodes[i];
+	      break;
+	    }        
+	}
 
 	var checkLetter = function(hand, thumb, index, middle, ring, pinky){
 		semaforo = false;
@@ -174,7 +188,7 @@
 							string = string.substring(0, string.length - 1);
 							last = null;
 							setTimeout(function(){removed=false;}, 600)
-							console.log("Borrado: " + string);
+							letter.innerHTML = 'back';
 							dataText.value = string;
 						}
 					}else if(gesture.type === 'swipe' && gesture.speed>1 && !removed){
@@ -182,7 +196,7 @@
 						string = string + " ";
 						last = null;
 						setTimeout(function(){removed=false;}, 600)
-						console.log("Espacio: " + string);
+						letter.innerHTML = 'space';
 						dataText.value = string;
 					}
 				}
@@ -202,9 +216,9 @@
 				if(checker.ok && last != checker.letter){
 					string += checker.letter;
 					last = checker.letter;
-					setTimeout(function(){last=null;}, 1500);
-					console.log("+Letter: " + string);
+					letter.innerHTML = checker.letter;
 					dataText.value = string;
+					setTimeout(function(){last=null;}, 1500);
 				}
 
 			}
@@ -212,21 +226,6 @@
 	});
 
 	visualizeHand = function(controller){
-	  controller.use('playback', {
-		  timeBetweenLoops: 1000,
-		  pauseOnHand: true
-	  }).on('riggedHand.meshAdded', function(handMesh, leapHand){
-		  handMesh.material.opacity = 1;
-	  });
-	  
-	  var overlay = controller.plugins.playback.player.overlay;
-	  overlay.style.right = 0;
-	  overlay.style.left = 'auto';
-	  overlay.style.top = 'auto';
-	  overlay.style.padding = 0;
-	  overlay.style.bottom = '13px';
-	  overlay.style.width = '180px';
-	
 	
 	  controller.use('riggedHand', {
 		scale: 1.3,
