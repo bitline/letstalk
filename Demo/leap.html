@@ -38,10 +38,17 @@
 	};
 
 	var isC = function(hand, thumb, index, middle, ring, pinky){
-		if (!thumb.extended && !index.extended && !middle.extended && !ring.extended && !pinky.extended && hand.grabStrength > 0.5 && hand.grabStrength < 0.69){
+		if (hand.grabStrength > 0.5 && hand.grabStrength < 0.69){
 			return {ok: true, letter:"C"};
 		}
 		return {ok: false, letter: "C"};
+	};
+
+	var isD = function(hand, thumb, index, middle, ring, pinky){
+		if (index.extended && !thumb.extended && !middle.extended && !ring.extended && !pinky.extended){
+			return {ok: true, letter: "D"};
+		}
+		return {ok: false, letter: "D"};
 	};
 
 	var isE = function(hand){
@@ -91,22 +98,23 @@
 		return {ok: false, letter:"W"};
 	}
 
-	var isX = function(hand, thumb, index, middle, ring, pinky){
-		var indexDistal = ring.dipPosition;
-		var thumbMedial = thumb.dipPosition;
-		// var indexDisPos = index.
-		var distance = Math.sqrt(Math.abs(  (thumbMedial[0]-indexDistal[0])^2 + (thumbMedial[1]-indexDistal[1])^2  ))
-		var open = Math.sqrt(Math.abs( (ring.pipPosition[0]-middle.pipPosition[0])^2 + (ring.pipPosition[1]-middle.pipPosition[1])^2 ))
-		if (index.extended && !middle.extended && !thumb.extended && !ring.extended && !pinky.extended && distance <= 3 && open >= 3){
-			
-			return {ok:true, letter:"X"};
+	// var isX = function(hand, thumb, index, middle, ring, pinky){
+	// 	var indexDistal = ring.dipPosition;
+	// 	var thumbMedial = thumb.dipPosition;
+	// 	var index_distal = index.type[0]
+	// 	var distance = Math.sqrt(Math.abs(  (thumbMedial[0]-indexDistal[0])^2 + (thumbMedial[1]-indexDistal[1])^2  ))
+	// 	var open = Math.sqrt(Math.abs( (ring.pipPosition[0]-middle.pipPosition[0])^2 + (ring.pipPosition[1]-middle.pipPosition[1])^2 ))
+	// 	if (index.extended && !middle.extended && !thumb.extended && !ring.extended && !pinky.extended && distance <= 3 && open >= 3){
+	// 		console.log(index)
+	// 		return {ok:true, letter:"X"};
 
-		}
-		return {ok:false, letter:"X"};
-	};
+	// 	}
+	// 	return {ok:false, letter:"X"};
+	// };
 
 
-	var signs = [isB, isU, isL, isA, isC, isY, isI, isX, isW];
+	var signs = [isB, isU, isL, isA, isC, isY, isI, isW];
+
 	var last = null;
 	var removed = false;
 	var string = "";
