@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Let's Talk! - Demo</title>
+	<link href='http://fonts.googleapis.com/css?family=Lobster|Montserrat:400,700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<h1>¡Let's Talk!</h1>
+	<div class="left">
+		<div id="data">
+			<span class="big-letter">-</span>
+		</div>
+		<form name="data">
+			<label>Traducci&oacute;n: </label>
+			<textarea name="text"></textarea>
+		</form>
+	</div>
+</body>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r67/three.js"></script>
+<script src="http://js.leapmotion.com/leap-0.6.2.min.js"></script>
+<script src="http://js.leapmotion.com/leap-plugins-0.1.6.1.js"></script>
+<script src="http://js.leapmotion.com/leap.rigged-hand-0.1.4.min.js"></script>
+<script type="text/javascript">
+	function concatData(id, data){
+		return id + ": " + data + "<br>";
+	}
+	var output = document.getElementById("data");
+	var frameString = "", handString = "", fingerString = "";
+	var semaforo = true;
+	var dataForm = document.data;
+	var dataText = dataForm.text;
+	var hand, finger;
+
+	var isA = function(hand, thumb, index, middle, ring, pinky){
+		if(!thumb.extended && !index.extended && !middle.extended && !ring.extended && !pinky.extended && hand.grabStrength === 1){
+			return {ok: true, letter: 'A'};
+		}
+		return {ok: false,  letter: 'A'};
+	};
+
+	var isB = function(hand, thumb, index, middle, ring, pinky){
+		var thumbDistal = thumb.dipPosition;
+		var palm = hand.palmPosition;
+		var distance = Math.sqrt( (palm[0]-thumbDistal[0])^2 + (palm[2]-thumbDistal[2])^2 )
+		if(distance <= 4 && index.extended && middle.extended && ring.extended && pinky.extended && !thumb.extended){
+			return {ok:true, letter:"B"};
+		}
+		return {ok:false, letter:"B"};
+	};
+
+	var isC = function(hand, thumb, index, middle, ring, pinky){
+		if (hand.grabStrength > 0.5 && hand.grabStrength < 0.69){
+			return {ok: true, letter:"C"};
+		}
+		return {ok: false, letter: "C"};
+	};
+
+	var isD = function(hand, thumb, index, middle, ring, pinky){
+		if (index.extended && !thumb.extended && !middle.extended && !ring.extended && !pinky.extended){
+			return {ok: true, letter: "D"};
+		}
+		return {ok: false, letter: "D"};
+	};
+
+	var isE = function(hand){
+		if(hand.grabStrength > 0.65 && hand.grabStrength < 0.8){
+			return {ok: true, letter: "E"};
+		}
+		return {ok: false, letter: "E"};
+	};
+
+	var isL = function(hand, thumb, index, middle, ring, pinky){
+		if (index.extended && !middle.extended && thumb.extended && !ring.extended && !pinky.extended){
+			return {ok:true, letter:"L"};
+		}
+		return {ok:false, letter:"L"};
+	};
+
+	var isU = function(hand, thumb, index, middle, ring, pinky){
+		var indexDistal = ring.dipPosition;
+		var thumbMedial = thumb.dipPosition;
+
+		var distance = Math.sqrt(Math.abs(  (thumbMedial[0]-indexDistal[0])^2 + (thumbMedial[1]-indexDistal[1])^2  ));
+		var open = Math.sqrt(Math.abs( (index.pipPosition[0]-middle.pipPosition[0])^2 + (index.pipPosition[1]-middle.pipPosition[1])^2 ));
+		if (index.extended && middle.extended && !thumb.extended && !ring.extended && !pinky.extended && distance <= 2 && open < 3){
+			return {ok:true, letter:"U"};
+		}
+		return {ok:false, letter:"U"};
+	};
+
+	var isV = function(hand, thumb, index, middle, ring, pinky){
+		var indexDistal = ring.dipPosition;
+		var thumbMedial = thumb.dipPosition;
+
+		var distance = Math.sqrt(Math.abs(  (thumbMedial[0]-indexDistal[0])^2 + (thumbMedial[1]-indexDistal[1])^2  ))
+		var open = Math.sqrt(Math.abs( (index.pipPosition[0]-middle.pipPosition[0])^2 + (index.pipPosition[1]-middle.pipPosition[1])^2 ))
+		if (index.extended && middle.extended && !thumb.extended && !ring.extended && !pinky.extended && distance <= 3 && open > 3){
+			return {ok:true, letter:"V"};
+		}
+		return {ok:false, letter:"V"};
+	};
+
+	var isY = function(hand, thumb, index, middle, ring, pinky){
+		if (pinky.extended && thumb.extended && !index.extended && !middle.extended && !ring.extended){
+			return {ok: true, letter: "Y"};
+		}
+		return {ok: false, letter: "Y"};
+	};
+
+	var isI = function(hand, thumb, index, middle, ring, pinky){
+		if (pinky.extended && !thumb.extended && !index.extended && !middle.extended && !ring.extended){
+			return {ok: true, letter: "I"};
+		}
+		return {ok: false, letter: "I"};
+	};
+
+	var isW = function(hand, thumb, index, middle, ring, pinky){
+		if(index.extended && middle.extended && !thumb.extended && !pinky.extended && ring.extended){
+			return {ok: true, letter:"W"};
+		}
+		return {ok: false, letter:"W"};
+	};
+
+	// var isX = function(hand, thumb, index, middle, ring, pinky){
+	// 	var indexDistal = ring.dipPosition;
+	// 	var thumbMedial = thumb.dipPosition;
+	// 	var index_distal = index.type[0]
+	// 	var distance = Math.sqrt(Math.abs(  (thumbMedial[0]-indexDistal[0])^2 + (thumbMedial[1]-indexDistal[1])^2  ))
+	// 	var open = Math.sqrt(Math.abs( (ring.pipPosition[0]-middle.pipPosition[0])^2 + (ring.pipPosition[1]-middle.pipPosition[1])^2 ))
+	// 	if (index.extended && !middle.extended && !thumb.extended && !ring.extended && !pinky.extended && distance <= 3 && open >= 3){
+	// 		console.log(index)
+	// 		return {ok:true, letter:"X"};
+
+	// 	}
+	// 	return {ok:false, letter:"X"};
+	// };
+
+
+	var signs_right = [isB, isV, isC, isY, isI, isW, isL];
+	var signs_left = [isA, isU]
+
+	var last = null;
+	var removed = false;
+	var string = "";
+
+	var letter = null;
+	for (var i = 0; i < output.childNodes.length; i++) {
+	    if (output.childNodes[i].className == "big-letter") {
+	      letter = output.childNodes[i];
+	      break;
+	    }        
+	}
+
+	var checkLetter = function(hand, thumb, index, middle, ring, pinky){
+		semaforo = false;
+		var check = false;
+		if(hand.type === 'right'){
+			for(var s=0; s<signs_right.length; s++){
+				var is = signs_right[s](hand, thumb, index, middle, ring, pinky); 
+				if(is.ok){
+					semaforo = true;
+					return is;
+				}
+			}
+		}
+		if(hand.type === 'left'){
+			for(var s=0; s<signs_left.length; s++){
+				var is = signs_left[s](hand, thumb, index, middle, ring, pinky); 
+				if(is.ok){
+					semaforo = true;
+					return is;
+				}
+			}
+		}
+		semaforo = true;
+		return {ok:false, letter: null};
+	};
+
+	var options = { enableGestures: true};
+	Leap.loop(options, function(frame){
+		frameString = concatData("frame_id", frame.id);
+		frameString += concatData("num_hands", frame.hands.length);
+		frameString += concatData("num_fingers", frame.fingers.length);
+		frameString += "<br>";
+
+
+		for(var h=0; h<frame.hands.length; h++){
+			var hand = frame.hands[h];
+			var coords = {};
+			if(!semaforo){ return false; }
+
+			var thumb, index, middle, ring, pinky;
+
+			thumb = hand.fingers[0];
+			index = hand.fingers[1];
+			middle = hand.fingers[2];
+			ring = hand.fingers[3];
+			pinky = hand.fingers[4];
+
+			var checker = checkLetter(hand, thumb, index, middle, ring, pinky);
+			if(checker.ok && last != checker.letter){
+				string += checker.letter;
+				last = checker.letter;
+				letter.innerHTML = checker.letter;
+				dataText.value = string;
+				setTimeout(function(){last=null;}, 1500);
+			}
+			if (thumb.extended){
+				console.log("Pulgarcito");
+			}
+			if(hand.type === 'left'){
+				for(var g = 0; g < frame.gestures.length; g++){
+		    		var gesture = frame.gestures[g];
+					if(gesture.type === 'circle' && gesture.radius > 50 && !removed){
+						if(string.length > 0){
+							removed = true;
+							string = string.substring(0, string.length - 1);
+							last = null;
+							setTimeout(function(){removed=false;}, 600)
+							letter.innerHTML = 'back';
+							dataText.value = string;
+						}
+					}else if(gesture.type === 'swipe' && gesture.speed>1 && !removed){
+						removed = true;
+						string = string + " ";
+						last = null;
+						setTimeout(function(){removed=false;}, 600)
+						letter.innerHTML = 'space';
+						dataText.value = string;
+					}
+				}
+				return;
+			}
+		
+		}
+	});
+
+	visualizeHand = function(controller){
+	
+	  controller.use('riggedHand', {
+		scale: 1.3,
+		boneColors: function (boneMesh, leapHand){
+		  if ((boneMesh.name.indexOf('Finger_') == 0) ) {
+			return {
+			  hue: 0.564,
+			  saturation: leapHand.grabStrength,
+			  lightness: 0.5
+			}
+		  }
+		}
+	  });
+	  
+	  var camera = controller.plugins.riggedHand.camera;  
+	  camera.position.set(0,20,-25);
+	  camera.lookAt(new THREE.Vector3(0,3,0));
+	};
+	visualizeHand(Leap.loopController);
+
+</script>
+</html>
