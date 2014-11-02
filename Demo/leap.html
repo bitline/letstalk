@@ -64,10 +64,21 @@
 		return {ok:false, letter:"L"};
 	};
 
+	var isY = function(hand, thumb, index, middle, ring, pinky){
+		if (pinky.extended && thumb.extended && !index.extended && !middle.extended && !ring.extended){
+			return {ok: true, letter: "Y"};
+		}
+		return {ok: false, letter: "Y"};
+	};
 
+	var isI = function(hand, thumb, index, middle, ring, pinky){
+		if (pinky.extended && !thumb.extended && !index.extended && !middle.extended && !ring.extended){
+			return {ok: true, letter: "i"};
+		}
+		return {ok: false, letter: "i"};
+	};
 
-
-	var signs = [isB, isU, isL, isA, isC];
+	var signs = [isB, isU, isL, isA, isC, isY, isI];
 	var last = null;
 	var removed = false;
 	var string = "";
