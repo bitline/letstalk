@@ -12,7 +12,10 @@
 	<div>
 		<form name="data_hand">
 			<textarea cols="80" rows="25" name="hand_fingers"></textarea>
+			<input name="letter" type="text" />
 		</form>
+		<button id="btn">Mostrar</button>
+		<button id="letra">Cambiar</button>
 	</div>
 <script src="http://js.leapmotion.com/leap-0.6.3.min.js"></script>
 <script type="text/javascript">
@@ -20,30 +23,50 @@
 	var output = document.getElementById('data');
 	var form = document.data_hand;
 	var textarea = form.hand_fingers;
+	var texta = "";
+	var letrabtn = document.getElementById('letra')
+	var letra = form.letter;
+	var letra_ = 'u';
+	var btn = document.getElementById('btn');
+	var tests = 0, iters=0;
 	var frameString;
 
+	btn.addEventListener('click', function(e){
+		textarea.value = texta;
+	});
+
+	letrabtn.addEventListener('click', function(e){
+		letra_ = letra.value;
+		texta = "";
+		iters = 0;
+		tests = 0;
+		console.log('Letra: ' + letra_)
+	});
+
 	var options = { enableGestures: true};
-	var tests = 0, iters=0;
 	Leap.loop(options, function(frame){
+		var coords = textarea.value;
 		for(var h=0; h < frame.hands.length; h++){
-			var coords = [];
 			var hand = frame.hands[h];
 			if(hand.type == 'right'){
 				if((iters+1) % 13 !== 0 ){ iters++; continue; }
 				hand.fingers.forEach(function(finger){
-					var fing = finger.type.toString();
-					var fingerData = [];
 					for(var b=0; b<finger.bones.length; b++){
 						var bone = finger.bones[b];
-						fingerData.push(bone.basis);
+						for(var v=0; v<bone.basis.length; v++){
+							var vector = bone.basis[v];
+							for(var c=0;c<vector.length; c++){
+								var point = vector[c];
+								coords += point + ', ';
+							}
+						}
 					}
-					coords.push(fingerData);
 				});
 				iters++;
 				tests++;
 
 				if(coords.length > 0){
-					textarea.value += JSON.stringify(coords) + ", 'k', "
+					texta += coords + "'"+letra_+"'\n "
 				}
 				console.log(tests);
 			}			
