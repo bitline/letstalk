@@ -9,130 +9,26 @@
 	<div id="data">
 	</div>
 
+	<div>
+		<form name="data_hand">
+			<textarea name="hand_fingers"></textarea>
+		</form>
+	</div>
 </body>
 <script src="http://js.leapmotion.com/leap-0.6.3.min.js"></script>
 <script type="text/javascript">
-	function concatData(id, data){
-		return id + ": " + data + "<br>";
-	}
-	var output = document.getElementById("data");
-	var frameString = "", handString = "", fingerString = "";
-	var semaforo = true;
-	var hand, finger;
-
-	var isA = function(hand, thumb, index, middle, ring, pinky){
-		if(!thumb.extended && !index.extended && !middle.extended && !ring.extended && !pinky.extended && hand.grabStrength === 1){
-			return {ok: true, letter: 'A'};
-		}
-		return {ok: false,  letter: 'A'};
-	};
-
-	var isB = function(hand, thumb, index, middle, ring, pinky){
-		var indexDistal = index.dipPosition;
-		var palm = hand.palmPosition;
-		var distance = Math.sqrt(Math.abs(  (palm[0]-indexDistal[0])^2 + (palm[1]-indexDistal[1])^2  ))
-		if(!thumb.extended && index.extended && middle.extended && ring.extended && pinky.extended && distance <= 4){
-			return {ok:true, letter:"B"};
-		}
-		return {ok:false, letter:"B"};
-	};
-
-	var isC = function(hand, thumb, index, middle, ring, pinky){
-		if (!thumb.extended && !index.extended && !middle.extended && !ring.extended && !pinky.extended && hand.grabStrength > 0.5 && hand.grabStrength < 0.69){
-			return {ok: true, letter:"C"};
-		}
-		return {ok: false, letter: "C"};
-	};
-
-	var isE = function(hand){
-		if(hand.grabStrength > 0.65 && hand.grabStrength < 0.8){
-			return {ok: true, letter: "E"};
-		}
-		return {ok: false, letter: "E"};
-	};
-
-	var isU = function(hand, thumb, index, middle, ring, pinky){
-		var indexDistal = ring.dipPosition;
-		var thumbMedial = thumb.dipPosition;
-
-		var distance = Math.sqrt(Math.abs(  (thumbMedial[0]-indexDistal[0])^2 + (thumbMedial[1]-indexDistal[1])^2  ))
-		var open = Math.sqrt(Math.abs( (ring.pipPosition[0]-middle.pipPosition[0])^2 + (ring.pipPosition[1]-middle.pipPosition[1])^2 ))
-		if (index.extended && middle.extended && !thumb.extended && !ring.extended && !pinky.extended && distance <= 3 && open >= 3){
-			return {ok:true, letter:"U"};
-		}
-		return {ok:false, letter:"U"};
-	};
-
-	var isL = function(hand, thumb, index, middle, ring, pinky){
-		if (index.extended && !middle.extended && thumb.extended && !ring.extended && !pinky.extended){
-			return {ok:true, letter:"L"};
-		}
-		return {ok:false, letter:"L"};
-	};
 
 
-
-
-	var signs = [isB, isU, isL, isA, isC];
-	var last = null;
-	var removed = false;
-	var string = "";
-
-	var checkLetter = function(hand, thumb, index, middle, ring, pinky){
-		semaforo = false;
-		var check = false;
-		for(var s=0; s<signs.length; s++){
-			var is = signs[s](hand, thumb, index, middle, ring, pinky); 
-			if(is.ok){
-				semaforo = true;
-				return is;
-			}
-		}
-		semaforo = true;
-		return {ok:false, letter: null};
-	};
+	var form = document.data_hand;
+	var textarea = form.hand_fingers;
 
 	var options = { enableGestures: true};
 	Leap.loop(options, function(frame){
-		frameString = concatData("frame_id", frame.id);
-		frameString += concatData("num_hands", frame.hands.length);
-		frameString += concatData("num_fingers", frame.fingers.length);
-		frameString += "<br>";
-
-		
-		for(var g = 0; g < frame.gestures.length; g++){
-    		var gesture = frame.gestures[g];
-			if(gesture.type === 'circle' && !removed){
-				if(string.length > 0){
-					removed = true;
-					string = string.substring(0, string.length - 1);
-					last = null;
-					setTimeout(function(){removed=false;}, 600)
-					console.log("Borrado: " + string);
-				}
-			}
-		}
-
 
 		for(var h=0; h<frame.hands.length; h++){
 			var hand = frame.hands[h];
-			if(!semaforo){ return false; }
-			if(hand.type){
-				var thumb, index, middle, ring, pinky;
-				thumb = hand.fingers[0];
-				index = hand.fingers[1];
-				middle = hand.fingers[2];
-				ring = hand.fingers[3];
-				pinky = hand.fingers[4];
-
-				var checker = checkLetter(hand, thumb, index, middle, ring, pinky);
-				if(checker.ok && last != checker.letter){
-					string += checker.letter;
-					last = checker.letter;
-					setTimeout(function(){last=null;}, 1500);
-					console.log("+Letter: " + string);
-				}
-
+			if(hand.type == 'right'){
+				
 			}
 		}
 
